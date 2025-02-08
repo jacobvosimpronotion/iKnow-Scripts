@@ -60,7 +60,6 @@ for entity in fbmData['knowledgeDomain']['FactBasedModel']['EntityTypes']['Entit
                 # remove ZWNJ and NBSP characters from communication pattern
                 if fact_type_comm_pattern:
                    fact_type_comm_pattern = fact_type_comm_pattern.replace('â€Œ', '').replace('Â', ' ')
-                   print(fact_type_comm_pattern)
                 # add row with fact type name
                 rows.append([name, nounform, gdn_object_type, is_kernel_vl, value_list_location, nr_of_fact_types, fact_type_code, fact_type_name, fact_type_comm_pattern])
     # add row for entity type if no fact types are found
