@@ -9,6 +9,7 @@ destinationFile = os.path.join(os.path.dirname(__file__), "../outputfiles/export
 strIsGDNObjT = "Is GDN object type"
 strKernelVL = "Is kernel of value list"
 strIsStructVT = "Is structured value type"
+strValueListCode = "Value list code"
 strValueListLoc = "Value list location"
 
 # Header row, so column titles
