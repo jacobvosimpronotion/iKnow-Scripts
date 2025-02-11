@@ -27,7 +27,7 @@ strWarNameCapitals = "Name of entity type has uppercase after 1st character."
 strMsgNounFormChevrons = "Noun form has characters outside < and >."
 
 # Header row, so column titles
-arrHeaderRow = ['ElementKind','ElementName','IssueType','Message','Details']
+arrHeaderRow = ['ElementKind','IssueType','ElementName','Message','Details']
 
 def count_elements(text):
     # Use regular expression to find all elements between < and >
