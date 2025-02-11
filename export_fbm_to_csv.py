@@ -7,7 +7,7 @@ destinationFile = os.path.join(os.path.dirname(__file__), "../outputfiles/export
 
 # Labels used in iKnow
 strIsGDNObjT = "Is GDN object type"
-strKernelVL = "Is kernel of value list"
+strIsKernelVL = "Is kernel of value list"
 strIsStructVT = "Is structured value type"
 strValueListCode = "Value list code"
 strValueListLoc = "Value list location"
@@ -40,7 +40,7 @@ for entity in fbmData['knowledgeDomain']['FactBasedModel']['EntityTypes']['Entit
     # kernel value list, if so
     is_kernel_vl = 'No'
     for prop in entity.get('CustomProperties', {}).get('CustomProperty', []):
-        if prop.get('Name') == strKernelVL and 'true' in prop.get('Text',[]):
+        if prop.get('Name') == strIsKernelVL and 'true' in prop.get('Text',[]):
             is_kernel_vl = 'Yes'
 
     # value list location
