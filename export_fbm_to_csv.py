@@ -23,7 +23,8 @@ rows = []
 for entity in fbmData['knowledgeDomain']['FactBasedModel']['EntityTypes']['EntityType']:
 
     # skip structured value types
-    if entity.get('CustomProperties', {}).get('CustomProperty', []) and any(prop.get('Name') == strIsStructVT and 'true' in prop.get('Text',[]) for prop in entity.get('CustomProperties', {}).get('CustomProperty', [])):
+    custom_properties = entity.get('CustomProperties', {}).get('CustomProperty', [])
+    if custom_properties and any(prop.get('Name') == strIsStructVT and 'true' in prop.get('Text', []) for prop in custom_properties):
         print("Skipping structured value type: " + entity.get('Name'))
         continue
 

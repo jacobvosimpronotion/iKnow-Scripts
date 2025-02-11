@@ -6,8 +6,11 @@ sourceFile_sem = "import_sem.json"
 destinationFile = "output.txt"
 
 # Labels used in iKnow
+strIsGDNObjT = "Is GDN object type"
 strIsStructVT = "Is structured value type"
-strKernelVL = "Is kernel of value list"
+strIsKernelVL = "Is kernel of value list"
+strValueListCode = "Value list code"
+strValueListLoc = "Value list location"
 
 strError = "ERROR: "
 strWarning = "WARNING: "
@@ -46,7 +49,7 @@ def func_is_structured_value_type(entity_type):
 def func_is_kernel_value_list(entity_type):
     if 'CustomProperties' in entity_type and 'CustomProperty' in entity_type['CustomProperties']:
         for custom_property in entity_type['CustomProperties']['CustomProperty']:
-            if custom_property.get('Name') == strKernelVL and 'true' in custom_property.get('Text',[]):
+            if custom_property.get('Name') == strIsKernelVL and 'true' in custom_property.get('Text',[]):
                 return True
     return
 
