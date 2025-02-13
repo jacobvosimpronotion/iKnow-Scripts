@@ -74,11 +74,11 @@ def func_is_kernel_value_list(entity_type):
                 return True
     return
 
-with open(sourceFile_fbm, 'r') as fbm:
-        fbmData = json.load(fbm)
+with open(sourceFile_fbm, 'r') as file:
+        fbmData = json.load(file)
 
-with open(sourceFile_sem, 'r') as sem:
-        semData = json.load(sem)
+with open(sourceFile_sem, 'r') as file:
+        semData = json.load(file)
 
 rows = []
 

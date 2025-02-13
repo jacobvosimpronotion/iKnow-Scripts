@@ -13,10 +13,10 @@ strValueListCode = "Value list code"
 strValueListLoc = "Value list location"
 
 # Header row, so column titles
-arrHeaderRow = ['EntityTypeName','NounForm','IsGDNObjectType','IsKernelValueList','ValueListLocation','NrOfFactTypes','FactTypeCode','FactTypeName','CommunicationPattern']
+arrHeaderRow = ['EntityTypeName','NounForm','IsGDNObjectType','IsKernelValueList','ValueListLocation','NrOfFactTypes','FactTypeCode','FactTypeName','CommunicationPattern1st']
 
-with open(sourceFile_fbm, 'r') as fbm:
-        fbmData = json.load(fbm)
+with open(sourceFile_fbm, 'r') as file:
+        fbmData = json.load(file)
 
 # Extract the relevant data
 rows = []
@@ -49,11 +49,12 @@ for entity in fbmData['knowledgeDomain']['FactBasedModel']['EntityTypes']['Entit
         if prop.get('Name') == strValueListLoc and 'Text' in prop and prop['Text']:
             value_list_location = prop['Text'][0]
 
-    # count fact types where role is played by this entity type
+    # fact types where role is played by this entity type; one row per fact type
     nr_of_fact_types = 0
     for fact_type in fbmData['knowledgeDomain']['FactBasedModel']['FactTypes']['FactType']:
         for role in fact_type['Roles']['Role']:
             if role.get('IsPlayedByObjecttype') == entity.get('Id'):
+                # count fact types where role is played by this entity type
                 nr_of_fact_types = nr_of_fact_types + 1
                 fact_type_code = fact_type.get('Code')
                 fact_type_name = fact_type.get('Name')                
@@ -61,7 +62,7 @@ for entity in fbmData['knowledgeDomain']['FactBasedModel']['EntityTypes']['Entit
                 # remove ZWNJ and NBSP characters from communication pattern
                 if fact_type_comm_pattern:
                    fact_type_comm_pattern = fact_type_comm_pattern.replace('â€Œ', '').replace('Â', ' ')
-                # add row with fact type name
+                # add row with fact type data
                 rows.append([name, nounform, gdn_object_type, is_kernel_vl, value_list_location, nr_of_fact_types, fact_type_code, fact_type_name, fact_type_comm_pattern])
     # add row for entity type if no fact types are found
     if nr_of_fact_types == 0:
