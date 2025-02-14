@@ -8,23 +8,23 @@ sourceFile_sem = os.path.join(os.path.dirname(__file__), "../inputfiles/import_s
 destinationFile = os.path.join(os.path.dirname(__file__), "../outputfiles/validation_results.csv")
 
 # Labels used in iKnow
-strIsGDNObjT = "Is GDN object type"
-strIsStructVT = "Is structured value type"
-strIsKernelVL = "Is kernel of value list"
-strValueListCode = "Value list code"
-strValueListLoc = "Value list location"
+lblIsGDNObjT = "Is GDN object type"
+lblIsStructVT = "Is structured value type"
+lblIsKernelVL = "Is kernel of value list"
+lblValueListCode = "Value list code"
+lblValueListLoc = "Value list location"
 
-strError = "Error"
-strWarning = "Warning"
+vError = "Error"
+vWarning = "Warning"
 
 # Errors
-strErrNameStartLowerCase = "Name of entity type starts with lowercase!"
-strMsgNounFormMissing = "Noun form is missing!"
-strMsgTermNotFound = "Name of entity type doesn't exist as preferred term in the semantic model!"
+msgNameStartLowerCase = "Name of entity type starts with lowercase!"
+msgNounFormMissing = "Noun form is missing!"
+msgTermNotFound = "Name of entity type doesn't exist as preferred term in the semantic model!"
 
 # Warnings
-strWarNameCapitals = "Name of entity type has uppercase after 1st character."
-strMsgNounFormChevrons = "Noun form has characters outside < and >."
+msgCapitalsInName = "Name of entity type has uppercase after 1st character."
+msgNounFormChevrons = "Noun form has characters outside < and >."
 
 # Header row, so column titles
 arrHeaderRow = ['ElementKind','IssueType','ElementName','Message','Details']
@@ -62,7 +62,7 @@ def func_no_text_outside_chevrons(noun_form):
 def func_is_structured_value_type(entity_type):
     if 'CustomProperties' in entity_type and 'CustomProperty' in entity_type['CustomProperties']:
         for custom_property in entity_type['CustomProperties']['CustomProperty']:
-            if custom_property.get('Name') == strIsStructVT and 'true' in custom_property.get('Text',[]):
+            if custom_property.get('Name') == lblIsStructVT and 'true' in custom_property.get('Text',[]):
                 return True
     return
 
@@ -70,7 +70,7 @@ def func_is_structured_value_type(entity_type):
 def func_is_kernel_value_list(entity_type):
     if 'CustomProperties' in entity_type and 'CustomProperty' in entity_type['CustomProperties']:
         for custom_property in entity_type['CustomProperties']['CustomProperty']:
-            if custom_property.get('Name') == strIsKernelVL and 'true' in custom_property.get('Text',[]):
+            if custom_property.get('Name') == lblIsKernelVL and 'true' in custom_property.get('Text',[]):
                 return True
     return
 
@@ -95,43 +95,49 @@ for entityType in fbmData['knowledgeDomain']['FactBasedModel']['EntityTypes']['E
     if func_is_structured_value_type(entityType):
          continue
 
-    strElementType = "EntityType"
-    strEntityTypeName = entityType['Name']
-    strEntityTypeNounForm = entityType.get('NounForm', None)
+    vElementType = "EntityType"
+    vEntityTypeName = entityType['Name']
+    vEntityTypeNounForm = entityType.get('NounForm', None)
+    vEntityTypeGUID = entityType['Id']
+    vEntityTypeDeclFT = entityType['IsObjectifiedFromFactType']
 
     # Error: Name doesn't start with capital
-    if not func_begint_met_hoofdletter(strEntityTypeName):
-        rows.append([strElementType, strError, strEntityTypeName, strErrNameStartLowerCase])
+    if not func_begint_met_hoofdletter(vEntityTypeName):
+        rows.append([vElementType, vError, vEntityTypeName, msgNameStartLowerCase])
     
     # Warning: Capitals after first character, excluding 'BRO' at any position
-    if not func_geen_hoofdletter_na_1e_teken(strEntityTypeName):
-        rows.append([strElementType, strWarning, strEntityTypeName, strWarNameCapitals])
+    if not func_geen_hoofdletter_na_1e_teken(vEntityTypeName):
+        rows.append([vElementType, vWarning, vEntityTypeName, msgCapitalsInName])
 
     # Error: Noun form is missing
-    if not strEntityTypeNounForm:
-        rows.append([strElementType, strError, strEntityTypeName, strMsgNounFormMissing])
+    if not vEntityTypeNounForm:
+        rows.append([vElementType, vError, vEntityTypeName, msgNounFormMissing])
 
     # Error: Noun form has other number of elements than variables of entity type
-    if strEntityTypeNounForm:
-        count = count_elements(strEntityTypeNounForm)
-        print(f"Number of elements: {count}")
+    if vEntityTypeNounForm:
+        count = count_elements(vEntityTypeNounForm)
+        # print(f"Number of elements: {count}")
+        # TO BE FINISHED!
 
     # Warning: Noun form has characters outside chevrons
-    if strEntityTypeNounForm:
-        if not func_no_text_outside_chevrons(strEntityTypeNounForm):
-            rows.append([strElementType, strWarning, strEntityTypeName, strMsgNounFormChevrons, strEntityTypeNounForm])
+    if vEntityTypeNounForm:
+        if not func_no_text_outside_chevrons(vEntityTypeNounForm):
+            rows.append([vElementType, vWarning, vEntityTypeName, msgNounFormChevrons, vEntityTypeNounForm])
 
     # Error: Name of entity type doesn't exist in semantic model
     found_concept = next(
         (concept for language in semData['KnowledgeDomain']['ConceptModel']['Languages']['Language'] if language['Language'] == "en"
          for concept in language['Concept']
          for term in concept['Terms']['Term']
-         if term['Preferred'] and term['Value'] == strEntityTypeName.lower()), None)
+         if term['Preferred'] == True and term['Value'] == vEntityTypeName.lower()), None)
     if not found_concept:
-        rows.append([strElementType, strError, strEntityTypeName, strMsgTermNotFound])
+        rows.append([vElementType, vError, vEntityTypeName, msgTermNotFound])
     
-    # if not any(entityType['Name'] == entity['Name'] for entity in semData['knowledgeDomain']['ConceptModel']['Languages']['Language']['Concept']['Entity']):
-    #     rows.append([strElementType, strError, strEntityTypeName, "Name doesn't exist in semantic model"])
+    # Error: CommunicationPattern for declaring entity type is not an allowed sentence
+    fact_type = next((ft for ft in fbmData['knowledgeDomain']['FactBasedModel']['FactTypes']['FactType'] if ft['Id'] == vEntityTypeDeclFT), None)
+    patterns = fact_type['CommunicationPatterns']['CommunicationPattern'] if fact_type else []
+    for pattern in patterns:
+        print(pattern['Text'].replace('â€Œ', '').replace('Â', ''))
 
     # # testje
     # if 'CustomProperties' in entityType:
